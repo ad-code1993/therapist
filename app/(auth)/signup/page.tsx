@@ -154,7 +154,7 @@ export default function SignUp() {
 	const renderBasicInfoStep = () => (
 		<div className="grid gap-4">
 			<div className="grid gap-2">
-				<Label htmlFor="name">Full Name</Label>
+				<Label htmlFor="name">{currentStep === "therapist" ? "Full Name" : "Username"}</Label>
 				<Input
 					id="name"
 					placeholder="John Doe"
@@ -517,7 +517,6 @@ export default function SignUp() {
 				<CardFooter>
 					<div className="flex justify-center w-full border-t py-4">
 						<p className="text-center text-xs text-neutral-500">
-							Secured by <span className="text-orange-400">better-auth.</span>
 						</p>
 					</div>
 				</CardFooter>
