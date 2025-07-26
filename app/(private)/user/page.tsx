@@ -10,7 +10,7 @@ import Link from "next/link"
 // Mock data matching backend table structure
 const user = {
   id: 1,
-  name: "John Doe",
+  name: "Jmax",
   email: "john.doe@example.com",
   phone: "+1 (555) 123-4567",
   gender: "male",
