@@ -18,20 +18,24 @@ import {
   Shield,
   FileText,
   Calendar,
-  MapPin
+  MapPin,
+  DollarSign,
+  UserCheck
 } from "lucide-react";
 
 interface TherapistVerification {
-  id: string;
+  therapist_id: number;
   name: string;
   email: string;
-  phone: string;
-  license: string;
-  specialization: string;
-  experience: string;
-  submittedDate: string;
-  status: "pending" | "approved" | "rejected";
-  documents: string[];
+  phone_number: string;
+  qualification: string;
+  description: string;
+  location: string;
+  hourly_rate: number;
+  age: number;
+  gender: "male" | "female" | "non_binary" | "other";
+  verification: "pending" | "verified" | "rejected";
+  created_at: string;
 }
 
 interface Complaint {
@@ -49,52 +53,60 @@ interface Complaint {
 
 const sampleVerifications: TherapistVerification[] = [
   {
-    id: "1",
+    therapist_id: 1,
     name: "Dr. Sarah Williams",
     email: "sarah.williams@therapy.com",
-    phone: "+1 (555) 123-4567",
-    license: "LPC-12345",
-    specialization: "Anxiety, Depression, PTSD",
-    experience: "8 years",
-    submittedDate: "2024-01-15",
-    status: "pending",
-    documents: ["license.pdf", "certification.pdf", "background_check.pdf"]
+    phone_number: "+1 (555) 123-4567",
+    qualification: "Ph.D. in Clinical Psychology, Stanford University",
+    description: "Licensed clinical psychologist with 8 years of experience specializing in anxiety, depression, and trauma.",
+    location: "San Francisco, CA",
+    hourly_rate: 150,
+    age: 35,
+    gender: "female",
+    verification: "pending",
+    created_at: "2024-01-15"
   },
   {
-    id: "2",
+    therapist_id: 2,
     name: "Dr. Michael Chen",
     email: "michael.chen@therapy.com",
-    phone: "+1 (555) 234-5678",
-    license: "LCSW-67890",
-    specialization: "Couples Therapy, Family Counseling",
-    experience: "12 years",
-    submittedDate: "2024-01-14",
-    status: "approved",
-    documents: ["license.pdf", "certification.pdf", "references.pdf"]
+    phone_number: "+1 (555) 234-5678",
+    qualification: "LCSW, Master of Social Work, UC Berkeley",
+    description: "Licensed clinical social worker with 12 years of experience in couples therapy and family counseling.",
+    location: "Oakland, CA",
+    hourly_rate: 140,
+    age: 42,
+    gender: "male",
+    verification: "verified",
+    created_at: "2024-01-14"
   },
   {
-    id: "3",
+    therapist_id: 3,
     name: "Dr. Emma Rodriguez",
     email: "emma.rodriguez@therapy.com",
-    phone: "+1 (555) 345-6789",
-    license: "LMFT-11111",
-    specialization: "Trauma, EMDR, CBT",
-    experience: "6 years",
-    submittedDate: "2024-01-13",
-    status: "rejected",
-    documents: ["license.pdf", "certification.pdf"]
+    phone_number: "+1 (555) 345-6789",
+    qualification: "LMFT, Master of Marriage and Family Therapy, UCLA",
+    description: "Licensed marriage and family therapist specializing in trauma, EMDR, and CBT.",
+    location: "Los Angeles, CA",
+    hourly_rate: 130,
+    age: 38,
+    gender: "female",
+    verification: "rejected",
+    created_at: "2024-01-13"
   },
   {
-    id: "4",
+    therapist_id: 4,
     name: "Dr. David Thompson",
     email: "david.thompson@therapy.com",
-    phone: "+1 (555) 456-7890",
-    license: "PsyD-22222",
-    specialization: "Child Psychology, ADHD",
-    experience: "15 years",
-    submittedDate: "2024-01-12",
-    status: "pending",
-    documents: ["license.pdf", "certification.pdf", "background_check.pdf", "references.pdf"]
+    phone_number: "+1 (555) 456-7890",
+    qualification: "PsyD, Doctor of Psychology, Pepperdine University",
+    description: "Child psychologist with 15 years of experience in ADHD and developmental disorders.",
+    location: "San Diego, CA",
+    hourly_rate: 160,
+    age: 45,
+    gender: "male",
+    verification: "pending",
+    created_at: "2024-01-12"
   }
 ];
 
@@ -154,10 +166,10 @@ export default function AdminDashboard() {
   const [complaints, setComplaints] = useState<Complaint[]>(sampleComplaints);
   const [activeTab, setActiveTab] = useState<"verifications" | "complaints">("verifications");
 
-  const handleVerificationAction = (id: string, action: "approve" | "reject") => {
+  const handleVerificationAction = (therapist_id: number, action: "verified" | "rejected") => {
     setVerifications(verifications.map(v => 
-      v.id === id 
-        ? { ...v, status: action === "approve" ? "approved" : "rejected" }
+      v.therapist_id === therapist_id 
+        ? { ...v, verification: action }
         : v
     ));
   };
@@ -170,7 +182,8 @@ export default function AdminDashboard() {
     ));
   };
 
-  const pendingVerifications = verifications.filter(v => v.status === "pending").length;
+  const pendingVerifications = verifications.filter(v => v.verification === "pending").length;
+  const verifiedTherapists = verifications.filter(v => v.verification === "verified").length;
   const openComplaints = complaints.filter(c => c.status === "open").length;
   const urgentComplaints = complaints.filter(c => c.priority === "urgent").length;
 
@@ -186,13 +199,23 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "approved": return "bg-green-100 text-green-800";
+      case "verified": return "bg-green-100 text-green-800";
       case "rejected": return "bg-red-100 text-red-800";
       case "pending": return "bg-yellow-100 text-yellow-800";
       case "open": return "bg-red-100 text-red-800";
       case "investigating": return "bg-blue-100 text-blue-800";
       case "resolved": return "bg-green-100 text-green-800";
       case "closed": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getGenderColor = (gender: string) => {
+    switch (gender) {
+      case "male": return "bg-blue-100 text-blue-800";
+      case "female": return "bg-pink-100 text-pink-800";
+      case "non_binary": return "bg-purple-100 text-purple-800";
+      case "other": return "bg-gray-100 text-gray-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -223,6 +246,18 @@ export default function AdminDashboard() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
+                <UserCheck className="h-8 w-8 text-green-600" />
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Verified Therapists</p>
+                  <p className="text-2xl font-bold text-gray-900">{verifiedTherapists}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center">
                 <AlertTriangle className="h-8 w-8 text-red-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Open Complaints</p>
@@ -239,18 +274,6 @@ export default function AdminDashboard() {
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Urgent Complaints</p>
                   <p className="text-2xl font-bold text-gray-900">{urgentComplaints}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <User className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Therapists</p>
-                  <p className="text-2xl font-bold text-gray-900">{verifications.length}</p>
                 </div>
               </div>
             </CardContent>
@@ -294,7 +317,7 @@ export default function AdminDashboard() {
 
             <div className="grid gap-6">
               {verifications.map((verification) => (
-                <Card key={verification.id} className="overflow-hidden">
+                <Card key={verification.therapist_id} className="overflow-hidden">
                   <CardHeader className="bg-gray-50 border-b">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -306,30 +329,33 @@ export default function AdminDashboard() {
                         <div>
                           <CardTitle className="text-xl">{verification.name}</CardTitle>
                           <div className="flex items-center space-x-2 mt-1">
-                            <Badge className={getStatusColor(verification.status)}>
-                              {verification.status}
+                            <Badge className={getStatusColor(verification.verification)}>
+                              {verification.verification}
+                            </Badge>
+                            <Badge className={getGenderColor(verification.gender)}>
+                              {verification.gender}
                             </Badge>
                             <span className="text-sm text-gray-500">
-                              License: {verification.license}
+                              Age: {verification.age}
                             </span>
                           </div>
                         </div>
                       </div>
-                      {verification.status === "pending" && (
+                      {verification.verification === "pending" && (
                         <div className="flex space-x-2">
                           <Button
                             size="sm"
                             className="bg-green-600 hover:bg-green-700"
-                            onClick={() => handleVerificationAction(verification.id, "approve")}
+                            onClick={() => handleVerificationAction(verification.therapist_id, "verified")}
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
-                            Approve
+                            Verify
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             className="text-red-600 border-red-600 hover:bg-red-50"
-                            onClick={() => handleVerificationAction(verification.id, "reject")}
+                            onClick={() => handleVerificationAction(verification.therapist_id, "rejected")}
                           >
                             <XCircle className="h-4 w-4 mr-2" />
                             Reject
@@ -353,40 +379,40 @@ export default function AdminDashboard() {
                           <Phone className="h-5 w-5 text-gray-400" />
                           <div>
                             <p className="text-sm font-medium text-gray-900">Phone</p>
-                            <p className="text-sm text-gray-600">{verification.phone}</p>
+                            <p className="text-sm text-gray-600">{verification.phone_number}</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <FileText className="h-5 w-5 text-gray-400" />
+                          <MapPin className="h-5 w-5 text-gray-400" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Specialization</p>
-                            <p className="text-sm text-gray-600">{verification.specialization}</p>
+                            <p className="text-sm font-medium text-gray-900">Location</p>
+                            <p className="text-sm text-gray-600">{verification.location}</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <Clock className="h-5 w-5 text-gray-400" />
+                          <DollarSign className="h-5 w-5 text-gray-400" />
                           <div>
-                            <p className="text-sm font-medium text-gray-900">Experience</p>
-                            <p className="text-sm text-gray-600">{verification.experience}</p>
+                            <p className="text-sm font-medium text-gray-900">Hourly Rate</p>
+                            <p className="text-sm text-gray-600">${verification.hourly_rate}</p>
                           </div>
                         </div>
                       </div>
                       
                       <div>
                         <div className="flex items-center space-x-3 mb-3">
-                          <Calendar className="h-5 w-5 text-gray-400" />
-                          <p className="text-sm font-medium text-gray-900">Submitted Documents</p>
+                          <FileText className="h-5 w-5 text-gray-400" />
+                          <p className="text-sm font-medium text-gray-900">Qualification</p>
                         </div>
-                        <div className="space-y-2">
-                          {verification.documents.map((doc, index) => (
-                            <div key={index} className="flex items-center space-x-2">
-                              <FileText className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm text-gray-600">{doc}</span>
-                            </div>
-                          ))}
+                        <p className="text-sm text-gray-600 mb-4">{verification.qualification}</p>
+                        
+                        <div className="flex items-center space-x-3 mb-3">
+                          <User className="h-5 w-5 text-gray-400" />
+                          <p className="text-sm font-medium text-gray-900">Description</p>
                         </div>
+                        <p className="text-sm text-gray-600">{verification.description}</p>
+                        
                         <div className="mt-4 text-sm text-gray-500">
-                          Submitted: {verification.submittedDate}
+                          Created: {verification.created_at}
                         </div>
                       </div>
                     </div>
