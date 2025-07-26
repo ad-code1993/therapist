@@ -2,7 +2,6 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { organization } from "better-auth/plugins";
 import { db } from "@/db/drizzle";
-import { nextCookies } from "better-auth/next-js";
 import {
   account,
   session,
@@ -44,7 +43,7 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: false,
     async sendResetPassword(data, request) {
       // TODO: Implement email sending logic
       console.log("Reset password email would be sent to:", data.user.email);
@@ -66,15 +65,25 @@ export const auth = betterAuth({
   },
   plugins: [
     organization({
-      allowUserToCreateOrganization: false, // Only super admins can create organizations
-      organizationLimit: 5, // Limit per user
-      sendInvitationEmail: async (data) => {
-        // TODO: Implement invitation email sending
-        console.log(
-          "Organization invitation email would be sent to:",
-          data.email
-        );
-      },
+      organizationCreation: {
+                disabled: false, // Set to true to disable organization creation
+                beforeCreate: async ({ organization, user }, request) => {
+                    // Run custom logic before organization is created
+                    // Optionally modify the organization data
+                    return {
+                        data: {
+                            ...organization,
+                            metadata: {
+                                customField: "value"
+                            }
+                        }
+                    }
+                },
+                // afterCreate: async ({ organization, member, user }, request) => {
+                //     // Run custom logic after organization is created
+                //     // e.g., create default resources, send notifications
+                // }
+            }
     }),
   ],
 });
