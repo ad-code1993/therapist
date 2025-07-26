@@ -1,58 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireSuperAdmin, requireAuth } from "@/lib/auth-middleware";
-import { createOrganization, getAllOrganizations } from "@/lib/admin";
+import { requireSuperAdmin } from "@/lib/auth-middleware";
+import { db } from "@/db/drizzle";
+import { organization } from "@/db/schema";
+import { randomUUID } from "crypto";
 
-// GET /api/organizations - List all organizations (Super Admin only)
+// Retrieve all organizations (Super Admin only)
 export async function GET(request: NextRequest) {
-  const authResult = await requireSuperAdmin(request);
+  const auth = await requireSuperAdmin(request);
+  if (auth instanceof NextResponse) return auth; // Auth failure already handled
 
-  if (authResult instanceof NextResponse) {
-    return authResult;
-  }
-
-  try {
-    const organizations = await getAllOrganizations();
-    return NextResponse.json({ organizations });
-  } catch (error) {
-    console.error("Error fetching organizations:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch organizations" },
-      { status: 500 }
-    );
-  }
+  const orgs = await db.select().from(organization);
+  return NextResponse.json(orgs);
 }
 
-// POST /api/organizations - Create new organization (Super Admin only)
+// Create a new organization (Super Admin only)
 export async function POST(request: NextRequest) {
-  const authResult = await requireSuperAdmin(request);
+  const auth = await requireSuperAdmin(request);
+  if (auth instanceof NextResponse) return auth;
 
-  if (authResult instanceof NextResponse) {
-    return authResult;
+  const body = await request.json().catch(() => undefined);
+  if (!body || typeof body.name !== "string" || body.name.trim() === "") {
+    return NextResponse.json({ error: "`name` is required" }, { status: 400 });
   }
 
+  const slug =
+    (body.slug as string | undefined)?.toLowerCase() ??
+    body.name.toLowerCase().replace(/\s+/g, "-");
+
   try {
-    const body = await request.json();
-    const { name, slug, logo, metadata } = body;
+    const [org] = await db
+      .insert(organization)
+      .values({
+        id: randomUUID(),
+        name: body.name.trim(),
+        slug,
+        logo: (body.logo as string | undefined) ?? null,
+        metadata: body.metadata ? JSON.stringify(body.metadata) : null,
+      })
+      .returning();
 
-    if (!name) {
-      return NextResponse.json(
-        { error: "Organization name is required" },
-        { status: 400 }
-      );
-    }
-
-    const organization = await createOrganization({
-      name,
-      slug,
-      logo,
-      metadata,
-    });
-
-    return NextResponse.json({ organization }, { status: 201 });
+    return NextResponse.json(org, { status: 201 });
   } catch (error) {
-    console.error("Error creating organization:", error);
+    console.error("Failed to create organization", error);
     return NextResponse.json(
-      { error: "Failed to create organization" },
+      { error: "Unable to create organization" },
       { status: 500 }
     );
   }
