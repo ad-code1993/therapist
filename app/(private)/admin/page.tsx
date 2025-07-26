@@ -164,7 +164,7 @@ const sampleComplaints: Complaint[] = [
 export default function AdminDashboard() {
   const [verifications, setVerifications] = useState<TherapistVerification[]>(sampleVerifications);
   const [complaints, setComplaints] = useState<Complaint[]>(sampleComplaints);
-  const [activeTab, setActiveTab] = useState<"verifications" | "complaints">("verifications");
+  const [activeTab, setActiveTab] = useState<"verifications" | "complaints" | "therapists">("verifications");
 
   const handleVerificationAction = (therapist_id: number, action: "verified" | "rejected") => {
     setVerifications(verifications.map(v => 
@@ -182,10 +182,19 @@ export default function AdminDashboard() {
     ));
   };
 
+  const handleRevokeTherapist = (therapist_id: number) => {
+    setVerifications(prev => prev.map(t => 
+      t.therapist_id === therapist_id 
+        ? { ...t, verification: "rejected" }
+        : t
+    ));
+  };
+
   const pendingVerifications = verifications.filter(v => v.verification === "pending").length;
   const verifiedTherapists = verifications.filter(v => v.verification === "verified").length;
   const openComplaints = complaints.filter(c => c.status === "open").length;
   const urgentComplaints = complaints.filter(c => c.priority === "urgent").length;
+  const totalTherapists = verifications.length;
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -303,6 +312,16 @@ export default function AdminDashboard() {
                 }`}
               >
                 Complaints ({complaints.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("therapists")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "therapists"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Therapist List ({totalTherapists})
               </button>
             </nav>
           </div>
@@ -522,6 +541,63 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Therapist List Section */}
+        {activeTab === "therapists" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">All Therapists</h2>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white rounded-lg shadow">
+                <thead>
+                  <tr className="border-b">
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Name</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Email</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Phone</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Location</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Qualification</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Status</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {verifications.map((therapist) => (
+                    <tr key={therapist.therapist_id} className="border-b last:border-0 hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                          {therapist.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <span>{therapist.name}</span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{therapist.email}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{therapist.phone_number}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600">{therapist.location}</td>
+                      <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">{therapist.qualification}</td>
+                      <td className="px-4 py-3">
+                        <Badge className={getStatusColor(therapist.verification)}>
+                          {therapist.verification}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          disabled={therapist.verification === 'rejected'}
+                          onClick={() => handleRevokeTherapist(therapist.therapist_id)}
+                        >
+                          Revoke
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

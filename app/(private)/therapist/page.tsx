@@ -209,6 +209,40 @@ const sampleClients: Client[] = [
   }
 ];
 
+const sampleTherapists: TherapistProfile[] = [
+  sampleTherapist,
+  {
+    therapist_id: 2,
+    name: "Dr. Michael Chen",
+    email: "michael.chen@therapy.com",
+    phone_number: "+1 (555) 234-5678",
+    qualification: "LCSW, Master of Social Work, UC Berkeley",
+    description: "Licensed clinical social worker with 12 years of experience in couples therapy and family counseling.",
+    location: "Oakland, CA",
+    hourly_rate: 140,
+    age: 42,
+    gender: "male",
+    verification: "verified",
+    created_at: "2022-05-10",
+    updated_at: "2024-01-15"
+  },
+  {
+    therapist_id: 3,
+    name: "Dr. Emma Rodriguez",
+    email: "emma.rodriguez@therapy.com",
+    phone_number: "+1 (555) 345-6789",
+    qualification: "LMFT, Master of Marriage and Family Therapy, UCLA",
+    description: "Licensed marriage and family therapist specializing in trauma, EMDR, and CBT.",
+    location: "Los Angeles, CA",
+    hourly_rate: 130,
+    age: 38,
+    gender: "female",
+    verification: "pending",
+    created_at: "2023-01-13",
+    updated_at: "2024-01-15"
+  }
+];
+
 export default function TherapistDashboard() {
   const [profile, setProfile] = useState<TherapistProfile>(sampleTherapist);
   const [isEditing, setIsEditing] = useState(false);
