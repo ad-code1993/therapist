@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Star, MapPin, Clock, Calendar, User, Filter, Heart, MessageCircle } from "lucide-react"
@@ -95,13 +94,14 @@ const recommendedTherapists = [
 ]
 
 const userPreferences = {
-  preferred_therapist_gender: "female",
-  sessionTypes: ["Video Call"],
-  preferred_times: ["morning", "afternoon"]
+  specialties: ["Anxiety", "Depression", "Trauma"],
+  sessionTypes: ["Video Call", "In-Person"],
+  preferredTimes: ["Morning", "Afternoon"],
+  location: "New York, NY",
+  maxPrice: "$150"
 }
 
 export default function TherapistRecommendations() {
-  const router = useRouter()
   const [selectedFilter, setSelectedFilter] = useState("all")
   const [sortBy, setSortBy] = useState("match")
 
@@ -132,6 +132,16 @@ export default function TherapistRecommendations() {
             <h1 className="text-3xl font-bold text-gray-900">Recommended Therapists</h1>
             <p className="text-gray-600 mt-1">Personalized recommendations based on your preferences</p>
           </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm">
+              <Filter className="w-4 h-4 mr-2" />
+              Filters
+            </Button>
+            <Button size="sm">
+              <Calendar className="w-4 h-4 mr-2" />
+              Book Session
+            </Button>
+          </div>
         </div>
 
         {/* User Preferences Summary */}
@@ -143,8 +153,8 @@ export default function TherapistRecommendations() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-3 bg-blue-50 rounded-lg">
-                <h4 className="font-medium text-blue-900">Preferred Gender</h4>
-                <p className="text-sm text-blue-700">{userPreferences.preferred_therapist_gender}</p>
+                <h4 className="font-medium text-blue-900">Specialties</h4>
+                <p className="text-sm text-blue-700">{userPreferences.specialties.join(", ")}</p>
               </div>
               <div className="p-3 bg-green-50 rounded-lg">
                 <h4 className="font-medium text-green-900">Session Types</h4>
@@ -152,11 +162,11 @@ export default function TherapistRecommendations() {
               </div>
               <div className="p-3 bg-purple-50 rounded-lg">
                 <h4 className="font-medium text-purple-900">Preferred Times</h4>
-                <p className="text-sm text-purple-700">{userPreferences.preferred_times.join(", ")}</p>
+                <p className="text-sm text-purple-700">{userPreferences.preferredTimes.join(", ")}</p>
               </div>
               <div className="p-3 bg-orange-50 rounded-lg">
-                <h4 className="font-medium text-orange-900">Experience</h4>
-                <p className="text-sm text-orange-700">Online therapy</p>
+                <h4 className="font-medium text-orange-900">Max Price</h4>
+                <p className="text-sm text-orange-700">{userPreferences.maxPrice}/session</p>
               </div>
             </div>
           </CardContent>
@@ -260,11 +270,11 @@ export default function TherapistRecommendations() {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2">
-                      <Button size="sm" className="flex-1" onClick={() => router.push(`/user/schedule?therapist=${therapist.id}`)}>
+                      <Button size="sm" className="flex-1">
                         <Calendar className="w-4 h-4 mr-2" />
                         Book Session
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => router.push(`/user/therapist/${therapist.id}`)}>
+                      <Button size="sm" variant="outline">
                         <User className="w-4 h-4 mr-2" />
                         View Profile
                       </Button>

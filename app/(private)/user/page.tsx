@@ -17,7 +17,7 @@ const user = {
   preferences: {
     preferred_therapist_gender: "any",
     specialties: ["Anxiety", "Depression", "Stress Management"],
-    session_types: ["Video Call"], // Only online
+    session_types: ["Video Call", "In-Person"],
     preferred_times: ["Morning", "Afternoon"]
   }
 }
@@ -53,7 +53,7 @@ const upcomingBookings = [
     session_date: "2024-01-18",
     session_time: "2:30 PM",
     duration: 60,
-    session_type: "Video Call",
+    session_type: "In-Person",
     status: "confirmed",
     total_amount: 150
   }
@@ -70,8 +70,7 @@ const recommendedTherapists = [
     hourly_rate: 120,
     gender: "female",
     availability: "Available this week",
-    match_score: 95,
-    session_types: ["Video Call"] // Only online
+    match_score: 95
   },
   {
     id: 2,
@@ -83,8 +82,7 @@ const recommendedTherapists = [
     hourly_rate: 150,
     gender: "male",
     availability: "Available next week",
-    match_score: 88,
-    session_types: ["Video Call"]
+    match_score: 88
   },
   {
     id: 3,
@@ -96,8 +94,7 @@ const recommendedTherapists = [
     hourly_rate: 130,
     gender: "female",
     availability: "Available today",
-    match_score: 92,
-    session_types: ["Video Call"]
+    match_score: 92
   }
 ]
 
@@ -138,22 +135,41 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}</h1>
-            <p className="text-gray-600 mt-1">Here's what's happening with your mental health journey</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => router.push("/user/sessions") }>
-              <Calendar className="w-4 h-4 mr-2" />
-              View Calendar
-            </Button>
-            <Button size="sm" onClick={() => router.push("/user/profile") }>
-              <User className="w-4 h-4 mr-2" />
-              My Profile
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}</h1>
+          <p className="text-gray-600 mt-1">Here's what's happening with your mental health journey</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" onClick={() => router.push("/user/schedule") }>
+            <Calendar className="w-4 h-4 mr-2" />
+            View Calendar
+          </Button>
+          <Button size="sm" onClick={() => router.push("/user/profile") }>
+            <User className="w-4 h-4 mr-2" />
+            My Profile
+          </Button>
+        </div>
+      </div>
+
+      {/* Search Bar */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center space-x-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search for therapists, specialties, or locations..."
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button onClick={() => router.push("/user/therapist_list?search=" + encodeURIComponent(searchQuery))}>
+              Search Therapists
             </Button>
           </div>
         </CardContent>
@@ -180,7 +196,6 @@ export default function ClientDashboard() {
             </div>
           </CardContent>
         </Card>
-
 
         <Card
           className="hover:shadow-lg transition-shadow cursor-pointer"
@@ -256,7 +271,7 @@ export default function ClientDashboard() {
                 ))}
               </div>
               <div className="mt-4">
-                <Button variant="outline" className="w-full" onClick={() => router.push("/user/sessions") }>
+                <Button variant="outline" className="w-full" onClick={() => router.push("/user/schedule") }>
                   View All Sessions
                 </Button>
               </div>
