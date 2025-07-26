@@ -111,7 +111,7 @@ const sampleSessions: Session[] = [
     clientName: "Michael Chen",
     date: "2024-01-15",
     time: "2:00 PM",
-    duration: 45,
+    duration: 23,
     type: "in-person",
     status: "confirmed"
   },
