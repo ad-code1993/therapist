@@ -27,6 +27,7 @@ export default function SignIn() {
 
     setLoading(true);
     try {
+      router.push("/user");
       await signIn.email(
         {
           email,

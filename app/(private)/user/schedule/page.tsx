@@ -1,10 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, Clock, User, Video, MapPin, CheckCircle, ArrowLeft, ArrowRight } from "lucide-react"
+import { Suspense, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Calendar,
+  Clock,
+  User,
+  Video,
+  MapPin,
+  CheckCircle,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 
 // Mock therapist data (in real app, fetch by id)
 const therapists = [
@@ -14,7 +29,7 @@ const therapists = [
     specialty: "Anxiety & Depression",
     hourly_rate: 120,
     location: "New York, NY",
-    gender: "female"
+    gender: "female",
   },
   {
     id: 2,
@@ -22,9 +37,9 @@ const therapists = [
     specialty: "Addiction Recovery",
     hourly_rate: 150,
     location: "Los Angeles, CA",
-    gender: "male"
-  }
-]
+    gender: "male",
+  },
+];
 
 const availabilitySlots = {
   "2024-01-15": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
@@ -32,24 +47,29 @@ const availabilitySlots = {
   "2024-01-17": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
   "2024-01-18": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
   "2024-01-19": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM"],
-  "2024-01-20": ["10:00 AM", "11:00 AM"]
-}
+  "2024-01-20": ["10:00 AM", "11:00 AM"],
+};
 
 const sessionTypes = [
-  { id: "video", name: "Video Call", icon: Video, description: "Secure video session from anywhere" }
-]
+  {
+    id: "video",
+    name: "Video Call",
+    icon: Video,
+    description: "Secure video session from anywhere",
+  },
+];
 
 const sessionLengths = [
   { id: "50", name: "50 minutes", description: "Standard session" },
   { id: "60", name: "60 minutes", description: "Extended session" },
-  { id: "90", name: "90 minutes", description: "Intensive session" }
-]
+  { id: "90", name: "90 minutes", description: "Intensive session" },
+];
 
-export default function ScheduleSession() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const therapistId = searchParams.get("therapist")
-  const therapist = therapists.find(t => String(t.id) === therapistId)
+function ScheduleSessionContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const therapistId = searchParams.get("therapist");
+  const therapist = therapists.find((t) => String(t.id) === therapistId);
 
   // If no therapist specified, show a message
   if (!therapist) {
@@ -57,50 +77,56 @@ export default function ScheduleSession() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
         <Card>
           <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-bold mb-2">Select a Therapist First</h2>
-            <p className="text-gray-600 mb-4">You need to choose a therapist before scheduling a session.</p>
-            <Button onClick={() => router.push("/user/therapist_list")}>Browse Therapists</Button>
+            <h2 className="text-2xl font-bold mb-2">
+              Select a Therapist First
+            </h2>
+            <p className="text-gray-600 mb-4">
+              You need to choose a therapist before scheduling a session.
+            </p>
+            <Button onClick={() => router.push("/user/therapist_list")}>
+              Browse Therapists
+            </Button>
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
-  const [selectedDate, setSelectedDate] = useState("")
-  const [selectedTime, setSelectedTime] = useState("")
-  const [selectedSessionType, setSelectedSessionType] = useState("video")
-  const [selectedSessionLength, setSelectedSessionLength] = useState("50")
-  const [currentStep, setCurrentStep] = useState(1)
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedSessionType, setSelectedSessionType] = useState("video");
+  const [selectedSessionLength, setSelectedSessionLength] = useState("50");
+  const [currentStep, setCurrentStep] = useState(1);
 
   const getCurrentPrice = () => {
-    const length = sessionLengths.find(l => l.id === selectedSessionLength)
-    if (!length) return 0
-    const minutes = parseInt(length.id)
-    return Math.round((therapist.hourly_rate * minutes) / 60)
-  }
+    const length = sessionLengths.find((l) => l.id === selectedSessionLength);
+    if (!length) return 0;
+    const minutes = parseInt(length.id);
+    return Math.round((therapist.hourly_rate * minutes) / 60);
+  };
 
   const handleDateSelect = (date: string) => {
-    setSelectedDate(date)
-    setSelectedTime("")
-  }
+    setSelectedDate(date);
+    setSelectedTime("");
+  };
 
   const handleTimeSelect = (time: string) => {
-    setSelectedTime(time)
-  }
+    setSelectedTime(time);
+  };
 
   const handleNext = () => {
     if (currentStep === 1 && selectedDate && selectedTime) {
-      setCurrentStep(2)
+      setCurrentStep(2);
     } else if (currentStep === 2) {
-      setCurrentStep(3)
+      setCurrentStep(3);
     }
-  }
+  };
 
   const handleBack = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(currentStep - 1);
     }
-  }
+  };
 
   const handleConfirmBooking = () => {
     // Handle booking confirmation - this would create a new booking record
@@ -110,18 +136,19 @@ export default function ScheduleSession() {
       session_date: selectedDate,
       session_time: selectedTime,
       duration: parseInt(selectedSessionLength),
-      session_type: sessionTypes.find(t => t.id === selectedSessionType)?.name,
+      session_type: sessionTypes.find((t) => t.id === selectedSessionType)
+        ?.name,
       hourly_rate: therapist.hourly_rate,
       total_amount: getCurrentPrice(),
-      status: "pending"
-    }
-    
-    console.log("Creating booking:", bookingData)
+      status: "pending",
+    };
+
+    console.log("Creating booking:", bookingData);
     // Here you would make an API call to create the booking
-    
+
     // Navigate to confirmation page
-    router.push("/user/confirmation")
-  }
+    router.push("/user/confirmation");
+  };
 
   const renderStep1 = () => (
     <div className="space-y-6">
@@ -141,8 +168,7 @@ export default function ScheduleSession() {
                   {therapist.location}
                 </div>
                 <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  ${therapist.hourly_rate}/hr
+                  <Clock className="w-4 h-4" />${therapist.hourly_rate}/hr
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="capitalize">{therapist.gender}</span>
@@ -161,35 +187,40 @@ export default function ScheduleSession() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-7 gap-2">
-            {Object.keys(availabilitySlots).slice(0, 14).map((date) => {
-              const slots = availabilitySlots[date as keyof typeof availabilitySlots]
-              const isSelected = selectedDate === date
-              const isToday = date === "2024-01-15" // Mock today's date
-              
-              return (
-                <button
-                  key={date}
-                  onClick={() => handleDateSelect(date)}
-                  className={`p-3 rounded-lg border text-center transition-colors ${
-                    isSelected
-                      ? "bg-blue-500 text-white border-blue-500"
-                      : isToday
-                      ? "bg-blue-50 border-blue-200 text-blue-700"
-                      : "bg-white border-gray-200 hover:border-blue-300"
-                  }`}
-                >
-                  <div className="text-xs font-medium">
-                    {new Date(date).toLocaleDateString('en-US', { weekday: 'short' })}
-                  </div>
-                  <div className="text-sm font-semibold">
-                    {new Date(date).getDate()}
-                  </div>
-                  <div className="text-xs opacity-75">
-                    {slots.length} slots
-                  </div>
-                </button>
-              )
-            })}
+            {Object.keys(availabilitySlots)
+              .slice(0, 14)
+              .map((date) => {
+                const slots =
+                  availabilitySlots[date as keyof typeof availabilitySlots];
+                const isSelected = selectedDate === date;
+                const isToday = date === "2024-01-15"; // Mock today's date
+
+                return (
+                  <button
+                    key={date}
+                    onClick={() => handleDateSelect(date)}
+                    className={`p-3 rounded-lg border text-center transition-colors ${
+                      isSelected
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : isToday
+                        ? "bg-blue-50 border-blue-200 text-blue-700"
+                        : "bg-white border-gray-200 hover:border-blue-300"
+                    }`}
+                  >
+                    <div className="text-xs font-medium">
+                      {new Date(date).toLocaleDateString("en-US", {
+                        weekday: "short",
+                      })}
+                    </div>
+                    <div className="text-sm font-semibold">
+                      {new Date(date).getDate()}
+                    </div>
+                    <div className="text-xs opacity-75">
+                      {slots.length} slots
+                    </div>
+                  </button>
+                );
+              })}
           </div>
         </CardContent>
       </Card>
@@ -199,11 +230,15 @@ export default function ScheduleSession() {
         <Card>
           <CardHeader>
             <CardTitle>Select Time</CardTitle>
-            <CardDescription>Available times for {new Date(selectedDate).toLocaleDateString()}</CardDescription>
+            <CardDescription>
+              Available times for {new Date(selectedDate).toLocaleDateString()}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-3">
-              {availabilitySlots[selectedDate as keyof typeof availabilitySlots]?.map((time) => (
+              {availabilitySlots[
+                selectedDate as keyof typeof availabilitySlots
+              ]?.map((time) => (
                 <button
                   key={time}
                   onClick={() => handleTimeSelect(time)}
@@ -221,7 +256,7 @@ export default function ScheduleSession() {
         </Card>
       )}
     </div>
-  )
+  );
 
   const renderStep2 = () => (
     <div className="space-y-6">
@@ -234,7 +269,7 @@ export default function ScheduleSession() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {sessionTypes.map((type) => {
-              const Icon = type.icon
+              const Icon = type.icon;
               return (
                 <button
                   key={type.id}
@@ -249,11 +284,13 @@ export default function ScheduleSession() {
                     <Icon className="w-6 h-6 text-blue-600" />
                     <div>
                       <h4 className="font-semibold">{type.name}</h4>
-                      <p className="text-sm text-gray-600">{type.description}</p>
+                      <p className="text-sm text-gray-600">
+                        {type.description}
+                      </p>
                     </div>
                   </div>
                 </button>
-              )
+              );
             })}
           </div>
         </CardContent>
@@ -268,9 +305,9 @@ export default function ScheduleSession() {
         <CardContent>
           <div className="space-y-3">
             {sessionLengths.map((length) => {
-              const minutes = parseInt(length.id)
-              const price = Math.round((therapist.hourly_rate * minutes) / 60)
-              
+              const minutes = parseInt(length.id);
+              const price = Math.round((therapist.hourly_rate * minutes) / 60);
+
               return (
                 <button
                   key={length.id}
@@ -284,20 +321,22 @@ export default function ScheduleSession() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold">{length.name}</h4>
-                      <p className="text-sm text-gray-600">{length.description}</p>
+                      <p className="text-sm text-gray-600">
+                        {length.description}
+                      </p>
                     </div>
                     <div className="text-lg font-semibold text-green-600">
                       ${price}
                     </div>
                   </div>
                 </button>
-              )
+              );
             })}
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 
   const renderStep3 = () => (
     <div className="space-y-6">
@@ -325,26 +364,28 @@ export default function ScheduleSession() {
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Date & Time</span>
                 <span className="font-medium">
-                  {new Date(selectedDate).toLocaleDateString()} at {selectedTime}
+                  {new Date(selectedDate).toLocaleDateString()} at{" "}
+                  {selectedTime}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Session Type</span>
                 <span className="font-medium">
-                  {sessionTypes.find(t => t.id === selectedSessionType)?.name}
+                  {sessionTypes.find((t) => t.id === selectedSessionType)?.name}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Duration</span>
                 <span className="font-medium">
-                  {sessionLengths.find(l => l.id === selectedSessionLength)?.name}
+                  {
+                    sessionLengths.find((l) => l.id === selectedSessionLength)
+                      ?.name
+                  }
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Hourly Rate</span>
-                <span className="font-medium">
-                  ${therapist.hourly_rate}/hr
-                </span>
+                <span className="font-medium">${therapist.hourly_rate}/hr</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Total Amount</span>
@@ -356,82 +397,101 @@ export default function ScheduleSession() {
 
             {/* Cancellation Policy */}
             <div className="p-4 bg-yellow-50 rounded-lg">
-              <h5 className="font-medium text-yellow-800 mb-2">Cancellation Policy</h5>
+              <h5 className="font-medium text-yellow-800 mb-2">
+                Cancellation Policy
+              </h5>
               <p className="text-sm text-yellow-700">
-                You can cancel or reschedule your session up to 24 hours before the appointment without any charges.
+                You can cancel or reschedule your session up to 24 hours before
+                the appointment without any charges.
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Schedule Session</h1>
-            <p className="text-gray-600 mt-1">Book your therapy session</p>
-          </div>
-          <div className="flex items-center gap-2">
-            {currentStep > 1 && (
-              <Button variant="outline" size="sm" onClick={handleBack}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
-            )}
-            {currentStep < 3 && selectedDate && selectedTime && (
-              <Button size="sm" onClick={handleNext}>
-                Next
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center space-x-4">
-          {[1, 2, 3].map((step) => (
-            <div key={step} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step <= currentStep ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'
-              }`}>
-                {step < currentStep ? (
-                  <CheckCircle className="w-5 h-5" />
-                ) : (
-                  step
-                )}
-              </div>
-              {step < 3 && (
-                <div className={`w-16 h-1 mx-2 ${
-                  step < currentStep ? 'bg-blue-500' : 'bg-gray-200'
-                }`} />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Schedule Session
+              </h1>
+              <p className="text-gray-600 mt-1">Book your therapy session</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {currentStep > 1 && (
+                <Button variant="outline" size="sm" onClick={handleBack}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              )}
+              {currentStep < 3 && selectedDate && selectedTime && (
+                <Button size="sm" onClick={handleNext}>
+                  Next
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
               )}
             </div>
-          ))}
-        </div>
-
-        {/* Step Content */}
-        {currentStep === 1 && renderStep1()}
-        {currentStep === 2 && renderStep2()}
-        {currentStep === 3 && renderStep3()}
-
-        {/* Final Action */}
-        {currentStep === 3 && (
-          <div className="flex items-center justify-center space-x-4">
-            <Button variant="outline" onClick={handleBack}>
-              Back
-            </Button>
-            <Button size="lg" onClick={handleConfirmBooking}>
-              <Calendar className="w-5 h-5 mr-2" />
-              Confirm Booking
-            </Button>
           </div>
-        )}
+
+          {/* Progress Steps */}
+          <div className="flex items-center justify-center space-x-4">
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="flex items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    step <= currentStep
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {step < currentStep ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : (
+                    step
+                  )}
+                </div>
+                {step < 3 && (
+                  <div
+                    className={`w-16 h-1 mx-2 ${
+                      step < currentStep ? "bg-blue-500" : "bg-gray-200"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Step Content */}
+          {currentStep === 1 && renderStep1()}
+          {currentStep === 2 && renderStep2()}
+          {currentStep === 3 && renderStep3()}
+
+          {/* Final Action */}
+          {currentStep === 3 && (
+            <div className="flex items-center justify-center space-x-4">
+              <Button variant="outline" onClick={handleBack}>
+                Back
+              </Button>
+              <Button size="lg" onClick={handleConfirmBooking}>
+                <Calendar className="w-5 h-5 mr-2" />
+                Confirm Booking
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  )
-} 
+  );
+}
+
+export default function ScheduleSession() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ScheduleSessionContent />
+    </Suspense>
+  );
+}
