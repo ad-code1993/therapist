@@ -1,16 +1,18 @@
-import { ReactNode } from "react"
 
-interface PrivateLayoutProps {
-  children: ReactNode
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+
+export default async function PrivateLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth.getSession();
+  
+  if (!session) {
+    redirect("/login");
+  }
+
+  return <>{children}</>;
 }
 
-export default function PrivateLayout({ children }: PrivateLayoutProps) {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* You can add navigation, sidebar, or other layout elements here */}
-      <main>
-        {children}
-      </main>
-    </div>
-  )
-}
