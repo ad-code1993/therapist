@@ -141,20 +141,23 @@ export default function ClientDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}</h1>
-            <p className="text-gray-600 mt-1">Here's what's happening with your mental health journey</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => router.push("/user/sessions") }>
-              <Calendar className="w-4 h-4 mr-2" />
-              View Calendar
-            </Button>
-            <Button size="sm" onClick={() => router.push("/user/profile") }>
-              <User className="w-4 h-4 mr-2" />
-              My Profile
-            </Button>
+         <Card>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user.name}</h1>
+              <p className="text-gray-600 mt-1">Here's what's happening with your mental health journey</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" onClick={() => router.push("/user/sessions") }>
+                <Calendar className="w-4 h-4 mr-2" />
+                View Calendar
+              </Button>
+              <Button size="sm" onClick={() => router.push("/user/profile") }>
+                <User className="w-4 h-4 mr-2" />
+                My Profile
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -363,6 +366,7 @@ export default function ClientDashboard() {
           </div>
         </CardContent>
       </Card>
+    </div>
     </div>
   )
 }
