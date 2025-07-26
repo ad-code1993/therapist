@@ -156,30 +156,55 @@ export default function ClientDashboard() {
               My Profile
             </Button>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Search Bar - moved to top */}
-        <Card>
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card
+          className="hover:shadow-lg transition-shadow cursor-pointer"
+          onClick={() => router.push("/user/recommendations")}
+          tabIndex={0}
+          role="button"
+          aria-label="Go to Recommendations"
+        >
           <CardContent className="p-6">
-            <div className="flex items-center space-x-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search for therapists, specialties, or locations..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Star className="w-6 h-6 text-purple-600" />
               </div>
-              <Button onClick={() => router.push("/user/therapist_list?search=" + encodeURIComponent(searchQuery))}>
-                Search Therapists
-              </Button>
+              <div>
+                <h3 className="font-semibold">Get Recommendations</h3>
+                <p className="text-sm text-gray-600">Personalized suggestions</p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
 
+        <Card
+          className="hover:shadow-lg transition-shadow cursor-pointer"
+          onClick={() => router.push("/user/profile")}
+          tabIndex={0}
+          role="button"
+          aria-label="Go to Session History"
+        >
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Clock className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Session History</h3>
+                <p className="text-sm text-gray-600">View past sessions</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Upcoming Sessions */}
         <div className="lg:col-span-2">
           <Card>
@@ -261,83 +286,83 @@ export default function ClientDashboard() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Recommended Therapists */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Recommended Therapists</CardTitle>
-                <CardDescription>
-                  Therapists that match your preferences and needs
-                </CardDescription>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => router.push("/user/recommendations") }>
-                <Filter className="w-4 h-4 mr-2" />
-                Filter
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recommendedTherapists.map((therapist) => (
-                <Card
-                  key={therapist.id}
-                  className="hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => router.push(`/user/therapist/${therapist.id}`)}
-                  tabIndex={0}
-                  role="button"
-                  aria-label={`View profile for ${therapist.name}`}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3">
-                      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                        <User className="w-6 h-6 text-gray-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">{therapist.name}</h4>
-                        <p className="text-sm text-gray-600">{therapist.specialty}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <div className="flex items-center">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm font-medium ml-1">{therapist.rating}</span>
-                            <span className="text-xs text-gray-500 ml-1">({therapist.review_count} reviews)</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          <MapPin className="w-3 h-3 text-gray-400" />
-                          <span className="text-xs text-gray-500">{therapist.location}</span>
-                        </div>
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                            {therapist.availability}
-                          </span>
-                          <span className="text-sm font-semibold text-green-600">
-                            ${therapist.hourly_rate}/hr
-                          </span>
-                        </div>
-                        <div className="mt-3">
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                            {therapist.match_score}% Match
-                          </span>
-                        </div>
-                        <Button size="sm" className="w-full mt-3" onClick={e => { e.stopPropagation(); router.push(`/user/schedule?therapist=${therapist.id}`) }}>
-                          Book Session
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <div className="mt-6 text-center">
-              <Button variant="outline" onClick={() => router.push("/user/recommendations") }>
-                View All Recommended Therapists
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Recommended Therapists */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Recommended Therapists</CardTitle>
+              <CardDescription>
+                Therapists that match your preferences and needs
+              </CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => router.push("/user/recommendations") }>
+              <Filter className="w-4 h-4 mr-2" />
+              Filter
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recommendedTherapists.map((therapist) => (
+              <Card
+                key={therapist.id}
+                className="hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => router.push(`/user/therapist/${therapist.id}`)}
+                tabIndex={0}
+                role="button"
+                aria-label={`View profile for ${therapist.name}`}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                      <User className="w-6 h-6 text-gray-600" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold">{therapist.name}</h4>
+                      <p className="text-sm text-gray-600">{therapist.specialty}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="text-sm font-medium ml-1">{therapist.rating}</span>
+                          <span className="text-xs text-gray-500 ml-1">({therapist.review_count} reviews)</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <MapPin className="w-3 h-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">{therapist.location}</span>
+                      </div>
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                          {therapist.availability}
+                        </span>
+                        <span className="text-sm font-semibold text-green-600">
+                          ${therapist.hourly_rate}/hr
+                        </span>
+                      </div>
+                      <div className="mt-3">
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                          {therapist.match_score}% Match
+                        </span>
+                      </div>
+                      <Button size="sm" className="w-full mt-3" onClick={e => { e.stopPropagation(); router.push(`/user/schedule?therapist=${therapist.id}`) }}>
+                        Book Session
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-6 text-center">
+            <Button variant="outline" onClick={() => router.push("/user/recommendations") }>
+              View All Recommended Therapists
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
