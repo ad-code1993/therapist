@@ -1,9 +1,8 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, Calendar, Clock, User, Video, MapPin, Download, MessageCircle } from "lucide-react"
+import { CheckCircle, Calendar, Clock, User, Video, MapPin, Download, Share2, MessageCircle } from "lucide-react"
 
 // Mock booking data matching backend table structure
 const bookingDetails = {
@@ -28,56 +27,19 @@ const bookingDetails = {
 }
 
 export default function BookingConfirmation() {
-  const router = useRouter()
-
   const handleDownloadCalendar = () => {
-    // Parse the time properly
-    const timeStr = bookingDetails.session_time
-    const [time, period] = timeStr.split(' ')
-    const [hours, minutes] = time.split(':')
-    
-    let hour = parseInt(hours)
-    if (period === 'PM' && hour !== 12) hour += 12
-    if (period === 'AM' && hour === 12) hour = 0
-    
-    // Create proper date objects
-    const sessionDate = new Date(bookingDetails.session_date)
-    sessionDate.setHours(hour, parseInt(minutes), 0, 0)
-    
-    const endDate = new Date(sessionDate)
-    endDate.setMinutes(endDate.getMinutes() + bookingDetails.duration)
-    
-    // Format dates for .ics file (YYYYMMDDTHHMMSSZ format)
-    const formatDate = (date: Date) => {
-      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
-    }
-    
-    // Create .ics file content
-    const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-SUMMARY:Therapy Session with ${bookingDetails.therapist.name}
-DESCRIPTION:Session with ${bookingDetails.therapist.name} - ${bookingDetails.therapist.specialty}
-DTSTART:${formatDate(sessionDate)}
-DTEND:${formatDate(endDate)}
-LOCATION:Video Call
-END:VEVENT
-END:VCALENDAR`
-    
-    // Create and download file
-    const blob = new Blob([icsContent], { type: 'text/calendar' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'therapy-session.ics'
-    link.click()
-    URL.revokeObjectURL(url)
+    // Handle calendar download
+    console.log("Downloading calendar event")
+  }
+
+  const handleShare = () => {
+    // Handle sharing
+    console.log("Sharing booking details")
   }
 
   const handleMessageTherapist = () => {
     // Handle messaging therapist
     console.log("Opening message to therapist")
-    // In a real app, this would open a messaging interface
   }
 
   return (
@@ -246,6 +208,10 @@ END:VCALENDAR`
             <Calendar className="w-4 h-4 mr-2" />
             Add to Calendar
           </Button>
+          <Button variant="outline" className="flex-1" onClick={handleShare}>
+            <Share2 className="w-4 h-4 mr-2" />
+            Share Details
+          </Button>
           <Button variant="outline" className="flex-1" onClick={handleMessageTherapist}>
             <MessageCircle className="w-4 h-4 mr-2" />
             Message Therapist
@@ -254,7 +220,7 @@ END:VCALENDAR`
 
         {/* Navigation */}
         <div className="text-center space-y-4">
-          <Button variant="outline" className="w-full sm:w-auto" onClick={() => router.push("/user/sessions")}>
+          <Button variant="outline" className="w-full sm:w-auto">
             View My Appointments
           </Button>
           <p className="text-sm text-gray-500">

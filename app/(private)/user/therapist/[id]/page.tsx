@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Star, MapPin, Clock, Calendar, User, Phone, Video, MessageCircle, Award, BookOpen, Clock as TimeIcon, CheckCircle } from "lucide-react"
@@ -11,9 +10,13 @@ const therapist = {
   id: 1,
   name: "Dr. Sarah Johnson",
   specialty: "Anxiety & Depression",
-  bio: "Licensed clinical psychologist specializing in cognitive behavioral therapy for anxiety and depression.",
-  long_bio: "Dr. Sarah Johnson is a licensed clinical psychologist with over 8 years of experience in treating anxiety and depression. She specializes in Cognitive Behavioral Therapy (CBT) and has helped hundreds of clients overcome their mental health challenges. Dr. Johnson believes in creating a safe, non-judgmental space where clients can explore their thoughts and feelings openly.",
-  credentials: ["Ph.D. Clinical Psychology", "Licensed Clinical Psychologist", "CBT Certified"],
+  bio: "I am a licensed clinical psychologist specializing in cognitive behavioral therapy (CBT) for anxiety and depression. With over 8 years of experience, I help individuals develop practical coping strategies and work through challenging life transitions. My approach is warm, collaborative, and evidence-based.",
+  long_bio: "I believe in creating a safe, non-judgmental space where clients feel heard and supported. My therapeutic approach combines cognitive behavioral therapy with mindfulness techniques to help you develop practical tools for managing anxiety, depression, and stress. I work with adults and adolescents, and I'm particularly experienced in helping people navigate life transitions, relationship issues, and trauma recovery.",
+  credentials: [
+    "Ph.D. in Clinical Psychology - Columbia University",
+    "M.A. in Psychology - New York University",
+    "B.A. in Psychology - University of California, Berkeley"
+  ],
   certifications: [
     "Licensed Clinical Psychologist (NY State)",
     "Certified in Cognitive Behavioral Therapy",
@@ -27,18 +30,19 @@ const therapist = {
   location: "New York, NY",
   experience_years: 8,
   languages: ["English", "Spanish"],
-  session_types: ["Video Call"],
+  session_types: ["Video Call", "In-Person"],
   availability: "Available this week",
   rating: 4.8,
   review_count: 127,
-  session_lengths: [50, 60, 90],
+  session_lengths: ["50 minutes", "60 minutes", "90 minutes"],
   availability_slots: {
-    "2024-01-15": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
-    "2024-01-16": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
-    "2024-01-17": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
-    "2024-01-18": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
-    "2024-01-19": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM"],
-    "2024-01-20": ["10:00 AM", "11:00 AM"]
+    monday: ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
+    tuesday: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
+    wednesday: ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
+    thursday: ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
+    friday: ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM"],
+    saturday: ["10:00 AM", "11:00 AM"],
+    sunday: []
   }
 }
 
@@ -70,7 +74,17 @@ const reviews = [
 ]
 
 export default function TherapistProfile() {
-  const router = useRouter()
+  const [selectedDate, setSelectedDate] = useState("")
+  const [selectedTime, setSelectedTime] = useState("")
+  const [selectedSessionType, setSelectedSessionType] = useState("Video Call")
+  const [selectedSessionLength, setSelectedSessionLength] = useState("50 minutes")
+
+  const availableTimes = selectedDate ? therapist.availability_slots[selectedDate.toLowerCase() as keyof typeof therapist.availability_slots] || [] : []
+
+  const calculatePrice = (length: string) => {
+    const minutes = parseInt(length.split(' ')[0])
+    return Math.round((therapist.hourly_rate * minutes) / 60)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -86,7 +100,7 @@ export default function TherapistProfile() {
               <MessageCircle className="w-4 h-4 mr-2" />
               Message
             </Button>
-            <Button size="sm" onClick={() => router.push(`/user/schedule?therapist=${therapist.id}`)}>
+            <Button size="sm">
               <Calendar className="w-4 h-4 mr-2" />
               Book Session
             </Button>
@@ -238,6 +252,84 @@ export default function TherapistProfile() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Booking Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Book a Session</CardTitle>
+                <CardDescription>Schedule your appointment</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Session Type</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={selectedSessionType}
+                    onChange={(e) => setSelectedSessionType(e.target.value)}
+                  >
+                    {therapist.session_types.map((type) => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Session Length</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={selectedSessionLength}
+                    onChange={(e) => setSelectedSessionLength(e.target.value)}
+                  >
+                    {therapist.session_lengths.map((length) => (
+                      <option key={length} value={length}>{length}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                  >
+                    <option value="">Select a date</option>
+                    {Object.keys(therapist.availability_slots).map((day) => (
+                      <option key={day} value={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedDate && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                    <select
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={selectedTime}
+                      onChange={(e) => setSelectedTime(e.target.value)}
+                    >
+                      <option value="">Select a time</option>
+                      {availableTimes.map((time) => (
+                        <option key={time} value={time}>{time}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm text-gray-600">Session Price</span>
+                    <span className="text-lg font-semibold text-green-600">
+                      ${calculatePrice(selectedSessionLength)}
+                    </span>
+                  </div>
+                  <Button className="w-full" disabled={!selectedDate || !selectedTime}>
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Book Session
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Quick Info */}
             <Card>
               <CardHeader>
@@ -258,7 +350,7 @@ export default function TherapistProfile() {
                 </div>
                 <div className="flex items-center gap-3">
                   <BookOpen className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">English, Spanish</span>
+                  <span className="text-sm text-gray-600">{therapist.languages.join(", ")}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-green-600">${therapist.hourly_rate}/hr</span>
