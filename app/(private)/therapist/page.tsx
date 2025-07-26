@@ -98,7 +98,7 @@ export default function TherapistDashboard() {
     }
   ];
 
-  const requests: Request[] = [
+  const [requests, setRequests] = useState<Request[]>([
     {
       id: "1",
       clientName: "Emma Wilson",
@@ -115,7 +115,11 @@ export default function TherapistDashboard() {
       urgency: "high",
       status: "pending"
     }
-  ];
+  ]);
+
+  const handleRequestAction = (id: string, action: "approved" | "rejected") => {
+    setRequests(prev => prev.map(r => r.id === id ? { ...r, status: action } : r));
+  };
 
   const clients: Client[] = [
     {
@@ -222,319 +226,342 @@ export default function TherapistDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Therapist Dashboard</h1>
-        <p className="text-gray-600">Welcome back, {therapist.name}</p>
-      </div>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Bookings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.totalBookings}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Completed Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.completedBookings}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Average Rating</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.averageRating.toFixed(1)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Reviews</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{stats.totalReviews}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Profile Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">Profile Information</CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
-              {isEditing ? "Cancel" : "Edit"}
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Therapist Dashboard</h1>
+            <p className="text-lg text-gray-600">Welcome back, {therapist.name}</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                {isEditing ? (
-                  <Input
-                    id="name"
-                    value={editedTherapist.name}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, name: e.target.value})}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-900">{therapist.name}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                {isEditing ? (
-                  <Input
-                    id="email"
-                    value={editedTherapist.email}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, email: e.target.value})}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-900">{therapist.email}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone Number</Label>
-                {isEditing ? (
-                  <Input
-                    id="phone"
-                    value={editedTherapist.phone_number}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, phone_number: e.target.value})}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-900">{therapist.phone_number}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="location">Location</Label>
-                {isEditing ? (
-                  <Input
-                    id="location"
-                    value={editedTherapist.location}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, location: e.target.value})}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-900">{therapist.location}</p>
-                )}
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="qualification">Qualification</Label>
-                {isEditing ? (
-                  <Input
-                    id="qualification"
-                    value={editedTherapist.qualification}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, qualification: e.target.value})}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-900">{therapist.qualification}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="hourly_rate">Hourly Rate</Label>
-                {isEditing ? (
-                  <Input
-                    id="hourly_rate"
-                    type="number"
-                    value={editedTherapist.hourly_rate}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, hourly_rate: parseInt(e.target.value)})}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-900">${therapist.hourly_rate}/hour</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="age">Age</Label>
-                {isEditing ? (
-                  <Input
-                    id="age"
-                    type="number"
-                    value={editedTherapist.age}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, age: parseInt(e.target.value)})}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-900">{therapist.age} years old</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="gender">Gender</Label>
-                {isEditing ? (
-                  <select
-                    id="gender"
-                    value={editedTherapist.gender}
-                    onChange={(e) => setEditedTherapist({...editedTherapist, gender: e.target.value as any})}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="non_binary">Non-binary</option>
-                    <option value="other">Other</option>
-                  </select>
-                ) : (
-                  <Badge className={getGenderColor(therapist.gender)}>
-                    {therapist.gender}
-                  </Badge>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="verification">Verification Status</Label>
-                <Badge className={getVerificationColor(therapist.verification)}>
-                  {therapist.verification}
-                </Badge>
-              </div>
-            </div>
-          </div>
-          <div className="mt-6">
-            <Label htmlFor="description">Professional Description</Label>
-            {isEditing ? (
-              <Textarea
-                id="description"
-                value={editedTherapist.description}
-                onChange={(e) => setEditedTherapist({...editedTherapist, description: e.target.value})}
-                rows={4}
-              />
-            ) : (
-              <p className="text-sm text-gray-900 mt-2">{therapist.description}</p>
-            )}
-          </div>
-          {isEditing && (
-            <div className="flex space-x-2 mt-6">
-              <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-              <Button variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Today's Activity Snapshot */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-gray-900">Snapshot of Today's Activity</h2>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Upcoming Sessions */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center">
-                  <Calendar className="h-5 w-5 mr-2 text-blue-600" />
-                  Upcoming Sessions
-                </CardTitle>
-                <Badge variant="secondary">{sessions.filter(s => s.status === 'confirmed').length}</Badge>
-              </div>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-blue-800">Total Bookings</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {sessions.filter(s => s.status === 'confirmed').slice(0, 3).map((session) => (
-                <div key={session.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    {getSessionTypeIcon(session.type)}
-                    <div>
-                      <p className="font-medium text-sm">{session.clientName}</p>
-                      <p className="text-xs text-gray-600">{session.time} • {session.duration}min</p>
-                    </div>
-                  </div>
-                  <Badge className={getStatusColor(session.status)}>
-                    {session.status}
-                  </Badge>
-                </div>
-              ))}
-              {sessions.filter(s => s.status === 'confirmed').length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">No upcoming sessions today</p>
-              )}
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600">{stats.totalBookings}</div>
             </CardContent>
           </Card>
-
-          {/* Pending Requests */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center">
-                  <Bell className="h-5 w-5 mr-2 text-orange-600" />
-                  Pending Requests
-                </CardTitle>
-                <Badge variant="secondary">{requests.filter(r => r.status === 'pending').length}</Badge>
-              </div>
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-green-800">Completed Sessions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {requests.filter(r => r.status === 'pending').slice(0, 3).map((request) => (
-                <div key={request.id} className="p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-medium text-sm">{request.clientName}</p>
-                    <Badge className={getUrgencyColor(request.urgency)}>
-                      {request.urgency}
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">{stats.completedBookings}</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-yellow-800">Average Rating</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-yellow-600">{stats.averageRating.toFixed(1)}</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-purple-800">Total Reviews</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">{stats.totalReviews}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Profile Section */}
+        <Card className="border border-gray-200 shadow-sm">
+          <CardHeader className="bg-gray-50 border-b border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl text-gray-900">Profile Information</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(!isEditing)}
+                className="border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                {isEditing ? <X className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
+                {isEditing ? "Cancel" : "Edit"}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="name" className="text-sm font-medium text-gray-700">Full Name</Label>
+                  {isEditing ? (
+                    <Input
+                      id="name"
+                      value={editedTherapist.name}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, name: e.target.value})}
+                      className="mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-900 mt-2">{therapist.name}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
+                  {isEditing ? (
+                    <Input
+                      id="email"
+                      value={editedTherapist.email}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, email: e.target.value})}
+                      className="mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-900 mt-2">{therapist.email}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone Number</Label>
+                  {isEditing ? (
+                    <Input
+                      id="phone"
+                      value={editedTherapist.phone_number}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, phone_number: e.target.value})}
+                      className="mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-900 mt-2">{therapist.phone_number}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="location" className="text-sm font-medium text-gray-700">Location</Label>
+                  {isEditing ? (
+                    <Input
+                      id="location"
+                      value={editedTherapist.location}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, location: e.target.value})}
+                      className="mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-900 mt-2">{therapist.location}</p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="qualification" className="text-sm font-medium text-gray-700">Qualification</Label>
+                  {isEditing ? (
+                    <Input
+                      id="qualification"
+                      value={editedTherapist.qualification}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, qualification: e.target.value})}
+                      className="mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-900 mt-2">{therapist.qualification}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="hourly_rate" className="text-sm font-medium text-gray-700">Hourly Rate</Label>
+                  {isEditing ? (
+                    <Input
+                      id="hourly_rate"
+                      type="number"
+                      value={editedTherapist.hourly_rate}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, hourly_rate: parseInt(e.target.value)})}
+                      className="mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-900 mt-2">${therapist.hourly_rate}/hour</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="age" className="text-sm font-medium text-gray-700">Age</Label>
+                  {isEditing ? (
+                    <Input
+                      id="age"
+                      type="number"
+                      value={editedTherapist.age}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, age: parseInt(e.target.value)})}
+                      className="mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-900 mt-2">{therapist.age} years old</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="gender" className="text-sm font-medium text-gray-700">Gender</Label>
+                  {isEditing ? (
+                    <select
+                      id="gender"
+                      value={editedTherapist.gender}
+                      onChange={(e) => setEditedTherapist({...editedTherapist, gender: e.target.value as any})}
+                      className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="non_binary">Non-binary</option>
+                      <option value="other">Other</option>
+                    </select>
+                  ) : (
+                    <Badge className={`mt-2 ${getGenderColor(therapist.gender)}`}>
+                      {therapist.gender}
                     </Badge>
-                  </div>
-                  <p className="text-xs text-gray-600 line-clamp-2">{request.message}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-gray-500">{request.date}</span>
-                    <Button size="sm" variant="outline" className="text-xs">
-                      Respond
-                    </Button>
-                  </div>
+                  )}
                 </div>
-              ))}
-              {requests.filter(r => r.status === 'pending').length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">No pending requests</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Recent Clients */}
-          <Card>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center">
-                  <Users className="h-5 w-5 mr-2 text-green-600" />
-                  Recent Clients
-                </CardTitle>
-                <Badge variant="secondary">{clients.filter(c => c.status === 'active').length}</Badge>
+                <div>
+                  <Label htmlFor="verification" className="text-sm font-medium text-gray-700">Verification Status</Label>
+                  <Badge className={`mt-2 ${getVerificationColor(therapist.verification)}`}>
+                    {therapist.verification}
+                  </Badge>
+                </div>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {clients.filter(c => c.status === 'active').slice(0, 3).map((client) => (
-                <div key={client.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-semibold">
-                        {client.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{client.name}</p>
-                      <p className="text-xs text-gray-600">{client.totalSessions} sessions</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">Last: {client.lastSession}</p>
-                    {client.nextSession && (
-                      <p className="text-xs text-blue-600">Next: {client.nextSession}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {clients.filter(c => c.status === 'active').length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">No recent clients</p>
+            </div>
+            <div className="mt-8">
+              <Label htmlFor="description" className="text-sm font-medium text-gray-700">Professional Description</Label>
+              {isEditing ? (
+                <Textarea
+                  id="description"
+                  value={editedTherapist.description}
+                  onChange={(e) => setEditedTherapist({...editedTherapist, description: e.target.value})}
+                  rows={4}
+                  className="mt-2"
+                />
+              ) : (
+                <p className="text-sm text-gray-900 mt-2">{therapist.description}</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+            {isEditing && (
+              <div className="flex space-x-3 mt-8">
+                <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+                <Button variant="outline" onClick={handleCancel}>
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Today's Activity Snapshot */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Snapshot of Today's Activity</h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Upcoming Sessions */}
+              <Card className="border border-gray-200">
+                <CardHeader className="pb-3 bg-blue-50 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center text-blue-800">
+                      <Calendar className="h-5 w-5 mr-2" />
+                      Upcoming Sessions
+                    </CardTitle>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">{sessions.filter(s => s.status === 'confirmed').length}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  {sessions.filter(s => s.status === 'confirmed').slice(0, 3).map((session) => (
+                    <div key={session.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        {getSessionTypeIcon(session.type)}
+                        <div>
+                          <p className="font-medium text-sm">{session.clientName}</p>
+                          <p className="text-xs text-gray-600">{session.time} • {session.duration}min</p>
+                        </div>
+                      </div>
+                      <Badge className={getStatusColor(session.status)}>
+                        {session.status}
+                      </Badge>
+                    </div>
+                  ))}
+                  {sessions.filter(s => s.status === 'confirmed').length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-4">No upcoming sessions today</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Pending Requests */}
+              <Card className="border border-gray-200">
+                <CardHeader className="pb-3 bg-orange-50 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center text-orange-800">
+                      <Bell className="h-5 w-5 mr-2" />
+                      Pending Requests
+                    </CardTitle>
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">{requests.filter(r => r.status === 'pending').length}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  {requests.slice(0, 3).map((request) => (
+                    <div key={request.id} className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-medium text-sm">{request.clientName}</p>
+                        <Badge className={getUrgencyColor(request.urgency)}>
+                          {request.urgency}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-600 line-clamp-2">{request.message}</p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-xs text-gray-500">{request.date}</span>
+                        {request.status === "pending" ? (
+                          <div className="flex gap-2">
+                            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1" onClick={() => handleRequestAction(request.id, "approved")}>Accept</Button>
+                            <Button size="sm" variant="outline" className="text-xs text-red-600 border-red-600 hover:bg-red-50 px-3 py-1" onClick={() => handleRequestAction(request.id, "rejected")}>Decline</Button>
+                          </div>
+                        ) : (
+                          <Badge className={request.status === "approved" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+                            {request.status === "approved" ? "Accepted" : "Declined"}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {requests.length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-4">No requests</p>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recent Clients */}
+              <Card className="border border-gray-200">
+                <CardHeader className="pb-3 bg-green-50 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg flex items-center text-green-800">
+                      <Users className="h-5 w-5 mr-2" />
+                      Recent Clients
+                    </CardTitle>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">{clients.filter(c => c.status === 'active').length}</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 space-y-3">
+                  {clients.filter(c => c.status === 'active').slice(0, 3).map((client) => (
+                    <div key={client.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-semibold">
+                            {client.name.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{client.name}</p>
+                          <p className="text-xs text-gray-600">{client.totalSessions} sessions</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-500">Last: {client.lastSession}</p>
+                        {client.nextSession && (
+                          <p className="text-xs text-blue-600">Next: {client.nextSession}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {clients.filter(c => c.status === 'active').length === 0 && (
+                    <p className="text-sm text-gray-500 text-center py-4">No recent clients</p>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
