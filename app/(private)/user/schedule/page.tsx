@@ -1,39 +1,42 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, Clock, User, Video, MapPin, CheckCircle, ArrowLeft, ArrowRight } from "lucide-react"
 
-// Mock data matching backend table structure
-const selectedTherapist = {
-  id: 1,
-  name: "Dr. Sarah Johnson",
-  specialty: "Anxiety & Depression",
-  hourly_rate: 120,
-  location: "New York, NY",
-  gender: "female"
-}
+// Mock therapist data (in real app, fetch by id)
+const therapists = [
+  {
+    id: 1,
+    name: "Dr. Sarah Johnson",
+    specialty: "Anxiety & Depression",
+    hourly_rate: 120,
+    location: "New York, NY",
+    gender: "female"
+  },
+  {
+    id: 2,
+    name: "Dr. Michael Chen",
+    specialty: "Addiction Recovery",
+    hourly_rate: 150,
+    location: "Los Angeles, CA",
+    gender: "male"
+  }
+]
 
-// Mock availability_slots data
 const availabilitySlots = {
   "2024-01-15": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
   "2024-01-16": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
   "2024-01-17": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
   "2024-01-18": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
   "2024-01-19": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM"],
-  "2024-01-20": ["10:00 AM", "11:00 AM"],
-  "2024-01-22": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
-  "2024-01-23": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
-  "2024-01-24": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM", "4:00 PM"],
-  "2024-01-25": ["9:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "3:00 PM"],
-  "2024-01-26": ["9:00 AM", "10:00 AM", "2:00 PM", "3:00 PM"],
-  "2024-01-27": ["10:00 AM", "11:00 AM"]
+  "2024-01-20": ["10:00 AM", "11:00 AM"]
 }
 
 const sessionTypes = [
-  { id: "video", name: "Video Call", icon: Video, description: "Secure video session from anywhere" },
-  { id: "in-person", name: "In-Person", icon: MapPin, description: "Face-to-face session at office" }
+  { id: "video", name: "Video Call", icon: Video, description: "Secure video session from anywhere" }
 ]
 
 const sessionLengths = [
@@ -43,6 +46,26 @@ const sessionLengths = [
 ]
 
 export default function ScheduleSession() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const therapistId = searchParams.get("therapist")
+  const therapist = therapists.find(t => String(t.id) === therapistId)
+
+  // If no therapist specified, show a message
+  if (!therapist) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold mb-2">Select a Therapist First</h2>
+            <p className="text-gray-600 mb-4">You need to choose a therapist before scheduling a session.</p>
+            <Button onClick={() => router.push("/user/therapist_list")}>Browse Therapists</Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   const [selectedDate, setSelectedDate] = useState("")
   const [selectedTime, setSelectedTime] = useState("")
   const [selectedSessionType, setSelectedSessionType] = useState("video")
@@ -53,7 +76,7 @@ export default function ScheduleSession() {
     const length = sessionLengths.find(l => l.id === selectedSessionLength)
     if (!length) return 0
     const minutes = parseInt(length.id)
-    return Math.round((selectedTherapist.hourly_rate * minutes) / 60)
+    return Math.round((therapist.hourly_rate * minutes) / 60)
   }
 
   const handleDateSelect = (date: string) => {
@@ -82,19 +105,22 @@ export default function ScheduleSession() {
   const handleConfirmBooking = () => {
     // Handle booking confirmation - this would create a new booking record
     const bookingData = {
-      therapist_id: selectedTherapist.id,
+      therapist_id: therapist.id,
       user_id: 1, // Current user ID
       session_date: selectedDate,
       session_time: selectedTime,
       duration: parseInt(selectedSessionLength),
       session_type: sessionTypes.find(t => t.id === selectedSessionType)?.name,
-      hourly_rate: selectedTherapist.hourly_rate,
+      hourly_rate: therapist.hourly_rate,
       total_amount: getCurrentPrice(),
       status: "pending"
     }
     
     console.log("Creating booking:", bookingData)
     // Here you would make an API call to create the booking
+    
+    // Navigate to confirmation page
+    router.push("/user/confirmation")
   }
 
   const renderStep1 = () => (
@@ -107,19 +133,19 @@ export default function ScheduleSession() {
               <User className="w-8 h-8 text-gray-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold">{selectedTherapist.name}</h3>
-              <p className="text-sm text-blue-600">{selectedTherapist.specialty}</p>
+              <h3 className="text-lg font-semibold">{therapist.name}</h3>
+              <p className="text-sm text-blue-600">{therapist.specialty}</p>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" />
-                  {selectedTherapist.location}
+                  {therapist.location}
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  ${selectedTherapist.hourly_rate}/hr
+                  ${therapist.hourly_rate}/hr
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="capitalize">{selectedTherapist.gender}</span>
+                  <span className="capitalize">{therapist.gender}</span>
                 </div>
               </div>
             </div>
@@ -243,7 +269,7 @@ export default function ScheduleSession() {
           <div className="space-y-3">
             {sessionLengths.map((length) => {
               const minutes = parseInt(length.id)
-              const price = Math.round((selectedTherapist.hourly_rate * minutes) / 60)
+              const price = Math.round((therapist.hourly_rate * minutes) / 60)
               
               return (
                 <button
@@ -289,8 +315,8 @@ export default function ScheduleSession() {
                 <User className="w-6 h-6 text-gray-600" />
               </div>
               <div>
-                <h4 className="font-semibold">{selectedTherapist.name}</h4>
-                <p className="text-sm text-gray-600">{selectedTherapist.specialty}</p>
+                <h4 className="font-semibold">{therapist.name}</h4>
+                <p className="text-sm text-gray-600">{therapist.specialty}</p>
               </div>
             </div>
 
@@ -317,7 +343,7 @@ export default function ScheduleSession() {
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Hourly Rate</span>
                 <span className="font-medium">
-                  ${selectedTherapist.hourly_rate}/hr
+                  ${therapist.hourly_rate}/hr
                 </span>
               </div>
               <div className="flex items-center justify-between">

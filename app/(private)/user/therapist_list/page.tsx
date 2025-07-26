@@ -11,103 +11,73 @@ const therapists = [
     id: 1,
     name: "Dr. Sarah Johnson",
     specialty: "Anxiety & Depression",
-    bio: "Licensed clinical psychologist specializing in cognitive behavioral therapy for anxiety and depression.",
-    credentials: ["Ph.D. Clinical Psychology", "Licensed Clinical Psychologist"],
-    hourly_rate: 120,
-    gender: "female",
     location: "New York, NY",
+    hourly_rate: 120,
     experience_years: 8,
-    languages: ["English", "Spanish"],
-    session_types: ["Video Call", "In-Person"],
-    availability: "Available this week",
-    rating: 4.8,
     review_count: 127,
-    specialties: ["Anxiety", "Depression", "Trauma", "Stress Management"]
+    gender: "female",
+    session_types: ["Video Call"],
+    bio: "Specialized in treating anxiety and depression with evidence-based approaches."
   },
   {
     id: 2,
     name: "Dr. Michael Chen",
     specialty: "Addiction Recovery",
-    bio: "Board-certified addiction specialist with expertise in substance abuse treatment and recovery support.",
-    credentials: ["Ph.D. Psychology", "Certified Addiction Specialist"],
-    hourly_rate: 150,
-    gender: "male",
     location: "Los Angeles, CA",
+    hourly_rate: 150,
     experience_years: 12,
-    languages: ["English", "Mandarin"],
-    session_types: ["Video Call", "In-Person", "Group Sessions"],
-    availability: "Available next week",
-    rating: 4.9,
     review_count: 89,
-    specialties: ["Addiction", "Substance Abuse", "Recovery", "Family Therapy"]
+    gender: "male",
+    session_types: ["Video Call", "Group Sessions"],
+    bio: "Expert in addiction recovery with a compassionate, non-judgmental approach."
   },
   {
     id: 3,
     name: "Dr. Emily Rodriguez",
-    specialty: "Trauma & PTSD",
-    bio: "Trauma-informed therapist specializing in PTSD treatment using evidence-based approaches including EMDR.",
-    credentials: ["Ph.D. Clinical Psychology", "EMDR Certified"],
-    hourly_rate: 130,
-    gender: "female",
+    specialty: "Trauma Therapy",
     location: "Chicago, IL",
+    hourly_rate: 140,
     experience_years: 10,
-    languages: ["English", "Spanish"],
-    session_types: ["Video Call", "In-Person"],
-    availability: "Available today",
-    rating: 4.7,
     review_count: 156,
-    specialties: ["PTSD", "Trauma", "EMDR", "Anxiety"]
+    gender: "female",
+    session_types: ["Video Call"],
+    bio: "Specialized in trauma-informed therapy and PTSD treatment."
   },
   {
     id: 4,
     name: "Dr. James Wilson",
     specialty: "Couples Therapy",
-    bio: "Licensed marriage and family therapist with expertise in relationship counseling and communication skills.",
-    credentials: ["M.A. Marriage & Family Therapy", "Licensed MFT"],
-    hourly_rate: 140,
-    gender: "male",
     location: "Miami, FL",
-    experience_years: 15,
-    languages: ["English"],
-    session_types: ["Video Call", "In-Person"],
-    availability: "Available this week",
-    rating: 4.6,
-    review_count: 203,
-    specialties: ["Couples Therapy", "Marriage Counseling", "Communication", "Conflict Resolution"]
+    hourly_rate: 130,
+    experience_years: 6,
+    review_count: 94,
+    gender: "male",
+    session_types: ["Video Call"],
+    bio: "Focused on helping couples build stronger, healthier relationships."
   },
   {
     id: 5,
     name: "Dr. Lisa Thompson",
-    specialty: "Child & Adolescent",
-    bio: "Child psychologist specializing in developmental disorders, behavioral issues, and family dynamics.",
-    credentials: ["Ph.D. Child Psychology", "Licensed Child Psychologist"],
-    hourly_rate: 110,
-    gender: "female",
+    specialty: "Child & Adolescent Therapy",
     location: "Seattle, WA",
+    hourly_rate: 125,
     experience_years: 9,
-    languages: ["English"],
-    session_types: ["Video Call", "In-Person", "Play Therapy"],
-    availability: "Available next week",
-    rating: 4.9,
-    review_count: 94,
-    specialties: ["Child Psychology", "ADHD", "Autism", "Behavioral Issues"]
+    review_count: 112,
+    gender: "female",
+    session_types: ["Video Call", "Play Therapy"],
+    bio: "Specialized in child and adolescent mental health with play therapy techniques."
   },
   {
     id: 6,
     name: "Dr. Robert Kim",
-    specialty: "Eating Disorders",
-    bio: "Specialized in treating eating disorders using evidence-based approaches including CBT and DBT.",
-    credentials: ["Ph.D. Clinical Psychology", "CBT Certified", "DBT Certified"],
-    hourly_rate: 160,
+    specialty: "Stress Management",
+    location: "Austin, TX",
+    hourly_rate: 110,
+    experience_years: 7,
+    review_count: 78,
     gender: "male",
-    location: "Boston, MA",
-    experience_years: 11,
-    languages: ["English", "Korean"],
-    session_types: ["Video Call", "In-Person"],
-    availability: "Available this week",
-    rating: 4.8,
-    review_count: 67,
-    specialties: ["Eating Disorders", "Body Image", "CBT", "DBT"]
+    session_types: ["Video Call"],
+    bio: "Helping clients manage stress and develop healthy coping mechanisms."
   }
 ]
 
@@ -123,7 +93,7 @@ const locations = [
 
 const genders = ["male", "female", "any"]
 
-const sessionTypes = ["Video Call", "In-Person", "Group Sessions", "Play Therapy"]
+const sessionTypes = ["Video Call", "Group Sessions", "Play Therapy"]
 
 export default function TherapistDirectory() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -139,7 +109,7 @@ export default function TherapistDirectory() {
                          therapist.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          therapist.bio.toLowerCase().includes(searchQuery.toLowerCase())
     
-    const matchesSpecialty = !selectedSpecialty || therapist.specialties.includes(selectedSpecialty)
+    const matchesSpecialty = !selectedSpecialty || therapist.specialty === selectedSpecialty
     const matchesLocation = !selectedLocation || therapist.location === selectedLocation
     const matchesGender = !selectedGender || selectedGender === "any" || therapist.gender === selectedGender
     const matchesSessionType = !selectedSessionType || therapist.session_types.includes(selectedSessionType)
@@ -321,11 +291,10 @@ export default function TherapistDirectory() {
                         <h3 className="text-lg font-semibold text-gray-900">{therapist.name}</h3>
                         <p className="text-sm text-blue-600 font-medium">{therapist.specialty}</p>
                         
-                        {/* Rating */}
+                        {/* Reviews */}
                         <div className="flex items-center gap-2 mt-2">
                           <div className="flex items-center">
                             <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm font-medium ml-1">{therapist.rating}</span>
                             <span className="text-xs text-gray-500 ml-1">({therapist.review_count} reviews)</span>
                           </div>
                         </div>
@@ -354,13 +323,10 @@ export default function TherapistDirectory() {
                           ))}
                         </div>
 
-                        {/* Price and Availability */}
+                        {/* Price */}
                         <div className="flex items-center justify-between mt-4">
                           <div>
                             <span className="text-lg font-semibold text-green-600">${therapist.hourly_rate}/hr</span>
-                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded ml-2">
-                              {therapist.availability}
-                            </span>
                           </div>
                         </div>
                       </div>

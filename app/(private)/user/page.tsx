@@ -17,7 +17,7 @@ const user = {
   preferences: {
     preferred_therapist_gender: "any",
     specialties: ["Anxiety", "Depression", "Stress Management"],
-    session_types: ["Video Call", "In-Person"],
+    session_types: ["Video Call"], // Only online
     preferred_times: ["Morning", "Afternoon"]
   }
 }
@@ -53,7 +53,7 @@ const upcomingBookings = [
     session_date: "2024-01-18",
     session_time: "2:30 PM",
     duration: 60,
-    session_type: "In-Person",
+    session_type: "Video Call",
     status: "confirmed",
     total_amount: 150
   }
@@ -70,7 +70,8 @@ const recommendedTherapists = [
     hourly_rate: 120,
     gender: "female",
     availability: "Available this week",
-    match_score: 95
+    match_score: 95,
+    session_types: ["Video Call"] // Only online
   },
   {
     id: 2,
@@ -82,7 +83,8 @@ const recommendedTherapists = [
     hourly_rate: 150,
     gender: "male",
     availability: "Available next week",
-    match_score: 88
+    match_score: 88,
+    session_types: ["Video Call"]
   },
   {
     id: 3,
@@ -94,7 +96,8 @@ const recommendedTherapists = [
     hourly_rate: 130,
     gender: "female",
     availability: "Available today",
-    match_score: 92
+    match_score: 92,
+    session_types: ["Video Call"]
   }
 ]
 
@@ -144,7 +147,7 @@ export default function ClientDashboard() {
             <p className="text-gray-600 mt-1">Here's what's happening with your mental health journey</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => router.push("/user/schedule") }>
+            <Button variant="outline" size="sm" onClick={() => router.push("/user/sessions") }>
               <Calendar className="w-4 h-4 mr-2" />
               View Calendar
             </Button>
@@ -176,48 +179,6 @@ export default function ClientDashboard() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions - only Recommendations and Session History */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card
-            className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => router.push("/user/recommendations")}
-            tabIndex={0}
-            role="button"
-            aria-label="Go to Recommendations"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Star className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Get Recommendations</h3>
-                  <p className="text-sm text-gray-600">Personalized suggestions</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card
-            className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => router.push("/user/profile")}
-            tabIndex={0}
-            role="button"
-            aria-label="Go to Session History"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Clock className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">Session History</h3>
-                  <p className="text-sm text-gray-600">View past sessions</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
         {/* Upcoming Sessions */}
         <div className="lg:col-span-2">
@@ -270,7 +231,7 @@ export default function ClientDashboard() {
                 ))}
               </div>
               <div className="mt-4">
-                <Button variant="outline" className="w-full" onClick={() => router.push("/user/schedule") }>
+                <Button variant="outline" className="w-full" onClick={() => router.push("/user/sessions") }>
                   View All Sessions
                 </Button>
               </div>

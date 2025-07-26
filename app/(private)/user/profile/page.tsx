@@ -20,15 +20,14 @@ const userProfile = {
     phone: "+1 (555) 987-6543"
   },
   preferences: {
-    preferred_therapist_gender: "any",
-    specialties: ["Anxiety", "Depression", "Stress Management"],
-    session_types: ["Video Call", "In-Person"],
-    preferred_times: ["Morning", "Afternoon"]
+    preferred_therapist_gender: "female",
+    session_types: ["Video Call"],
+    preferred_times: ["morning", "afternoon"]
   },
   insurance: {
     provider: "Blue Cross Blue Shield",
     member_id: "BCBS123456789",
-    group_number: "GRP001"
+    group_number: "GRP987654321"
   }
 }
 
@@ -58,10 +57,10 @@ const sessionHistory = [
       name: "Dr. Michael Chen",
       specialty: "Addiction Recovery"
     },
-    session_date: "2024-01-03",
+    session_date: "2024-01-08",
     session_time: "2:30 PM",
     duration: 60,
-    session_type: "In-Person",
+    session_type: "Video Call",
     status: "completed",
     hourly_rate: 150,
     total_amount: 150,
@@ -256,166 +255,10 @@ export default function ClientProfile() {
         </CardContent>
       </Card>
 
-      {/* Insurance Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Insurance Information</CardTitle>
-          <CardDescription>Your health insurance details</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
-              <input
-                type="text"
-                value={profile.insurance.provider}
-                onChange={(e) => setProfile({
-                  ...profile,
-                  insurance: { ...profile.insurance, provider: e.target.value }
-                })}
-                disabled={!isEditing}
-                className="w-full p-3 border border-gray-300 rounded-lg disabled:bg-gray-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Member ID</label>
-              <input
-                type="text"
-                value={profile.insurance.member_id}
-                onChange={(e) => setProfile({
-                  ...profile,
-                  insurance: { ...profile.insurance, member_id: e.target.value }
-                })}
-                disabled={!isEditing}
-                className="w-full p-3 border border-gray-300 rounded-lg disabled:bg-gray-50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Group Number</label>
-              <input
-                type="text"
-                value={profile.insurance.group_number}
-                onChange={(e) => setProfile({
-                  ...profile,
-                  insurance: { ...profile.insurance, group_number: e.target.value }
-                })}
-                disabled={!isEditing}
-                className="w-full p-3 border border-gray-300 rounded-lg disabled:bg-gray-50"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 
-  const renderPreferencesTab = () => (
-    <div className="space-y-6">
-      {/* Session Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Session Preferences</CardTitle>
-          <CardDescription>Your preferred session settings</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Therapist Gender</label>
-            <select
-              value={profile.preferences.preferred_therapist_gender}
-              onChange={(e) => setProfile({
-                ...profile,
-                preferences: { ...profile.preferences, preferred_therapist_gender: e.target.value }
-              })}
-              disabled={!isEditing}
-              className="w-full p-3 border border-gray-300 rounded-lg disabled:bg-gray-50"
-            >
-              <option value="any">Any Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Session Types</label>
-            <div className="space-y-2">
-              {["Video Call", "In-Person", "Phone Call"].map((type) => (
-                <label key={type} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={profile.preferences.session_types.includes(type)}
-                    onChange={(e) => {
-                      const newTypes = e.target.checked
-                        ? [...profile.preferences.session_types, type]
-                        : profile.preferences.session_types.filter(t => t !== type)
-                      setProfile({
-                        ...profile,
-                        preferences: { ...profile.preferences, session_types: newTypes }
-                      })
-                    }}
-                    disabled={!isEditing}
-                    className="rounded border-gray-300"
-                  />
-                  <span className="text-sm">{type}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Specialties</label>
-            <div className="grid grid-cols-2 gap-2">
-              {["Anxiety", "Depression", "Trauma", "Addiction", "Couples Therapy", "Stress Management"].map((specialty) => (
-                <label key={specialty} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={profile.preferences.specialties.includes(specialty)}
-                    onChange={(e) => {
-                      const newSpecialties = e.target.checked
-                        ? [...profile.preferences.specialties, specialty]
-                        : profile.preferences.specialties.filter(s => s !== specialty)
-                      setProfile({
-                        ...profile,
-                        preferences: { ...profile.preferences, specialties: newSpecialties }
-                      })
-                    }}
-                    disabled={!isEditing}
-                    className="rounded border-gray-300"
-                  />
-                  <span className="text-sm">{specialty}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Times</label>
-            <div className="space-y-2">
-              {["Morning", "Afternoon", "Evening"].map((time) => (
-                <label key={time} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={profile.preferences.preferred_times.includes(time)}
-                    onChange={(e) => {
-                      const newTimes = e.target.checked
-                        ? [...profile.preferences.preferred_times, time]
-                        : profile.preferences.preferred_times.filter(t => t !== time)
-                      setProfile({
-                        ...profile,
-                        preferences: { ...profile.preferences, preferred_times: newTimes }
-                      })
-                    }}
-                    disabled={!isEditing}
-                    className="rounded border-gray-300"
-                  />
-                  <span className="text-sm">{time}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
 
   const renderHistoryTab = () => (
     <div className="space-y-6">
@@ -494,19 +337,12 @@ export default function ClientProfile() {
             <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
             <p className="text-gray-600 mt-1">Manage your account and preferences</p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
-          </div>
         </div>
 
         {/* Tab Navigation */}
         <div className="flex space-x-1 bg-white rounded-lg p-1 shadow-sm">
           {[
             { id: "profile", label: "Profile", icon: User },
-            { id: "preferences", label: "Preferences", icon: Settings },
             { id: "history", label: "Session History", icon: Calendar }
           ].map((tab) => {
             const Icon = tab.icon
@@ -529,7 +365,6 @@ export default function ClientProfile() {
 
         {/* Tab Content */}
         {activeTab === "profile" && renderProfileTab()}
-        {activeTab === "preferences" && renderPreferencesTab()}
         {activeTab === "history" && renderHistoryTab()}
       </div>
     </div>
