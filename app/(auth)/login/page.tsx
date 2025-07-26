@@ -132,7 +132,6 @@ export default function SignIn() {
         <CardFooter>
           <div className="flex justify-center w-full border-t py-4">
             <p className="text-center text-xs text-neutral-500">
-              Secured by <span className="text-orange-400">better-auth.</span>
             </p>
           </div>
         </CardFooter>

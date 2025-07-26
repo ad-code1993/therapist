@@ -10,7 +10,7 @@ import Link from "next/link"
 // Mock data matching backend table structure
 const user = {
   id: 1,
-  name: "John Doe",
+  name: "Jmax",
   email: "john.doe@example.com",
   phone: "+1 (555) 123-4567",
   gender: "male",
@@ -33,7 +33,7 @@ const upcomingBookings = [
       hourly_rate: 120,
       gender: "female"
     },
-    session_date: "2024-01-15",
+    session_date: "2025-01-15",
     session_time: "10:00 AM",
     duration: 50,
     session_type: "Video Call",
@@ -50,7 +50,7 @@ const upcomingBookings = [
       hourly_rate: 150,
       gender: "male"
     },
-    session_date: "2024-01-18",
+    session_date: "2025-01-18",
     session_time: "2:30 PM",
     duration: 60,
     session_type: "Video Call",
